@@ -39,7 +39,7 @@ public:
 
 class ConsoleLogger : public Logger {
 public:
-    ConsoleLogger(const char* name) : name{name} {}
+    explicit ConsoleLogger(const char* name) : name{name} {}
 
     void transfer(const long fromAccountId, const long toAccountId, const long long amount) const override {
         std::cout << this->name << ": " << 
@@ -55,7 +55,7 @@ private:
 
 class Bank {
 public:
-    Bank(AccountDatabase& accountDatabase) : accountDatabase{accountDatabase} {}
+    explicit Bank(AccountDatabase& accountDatabase) : accountDatabase{accountDatabase} {}
 
     void setLogger(Logger *logger) {
         this->logger = logger;
