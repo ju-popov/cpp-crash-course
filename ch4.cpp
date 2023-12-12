@@ -3,7 +3,7 @@
 #include <thread>
 
 struct TimerClass {
-    TimerClass(const char* name) : name{name}, timestamp{getCurrentTimestamp()} {
+    explicit TimerClass(const char* name) : name{name}, timestamp{getCurrentTimestamp()} {
         std::cout << this->name << ": TimerClass() timestamp: " << timestamp << std::endl;
     }
 
