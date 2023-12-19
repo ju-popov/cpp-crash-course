@@ -61,6 +61,23 @@ namespace ch10 {
             });
         }
 
+        void set_collision_threshold_s(const double collision_threshold_s) {
+            if (collision_threshold_s < 1.0) {
+                throw std::invalid_argument{"collision_threshold_s less than 1.0"};
+            }
+
+            m_collision_threshold_s = collision_threshold_s;
+        }
+
+        [[nodiscard]] double get_collision_threshold_s() const {
+            return m_collision_threshold_s;
+        }
+
+        [[nodiscard]] double get_velocity_mps() const {
+            return m_velocity_mps;
+        }
+
+    private:
         void observe(const SpeedUpdate& update) {
             m_velocity_mps = update.velocity_mps;
         }
@@ -77,21 +94,6 @@ namespace ch10 {
             }
         }
 
-        void set_collision_threshold_s(const double collision_threshold_s) {
-            if (collision_threshold_s < 1.0) {
-                throw std::invalid_argument{"collision_threshold_s less than 1.0"};
-            }
-
-            m_collision_threshold_s = collision_threshold_s;
-        }
-
-        [[nodiscard]] double get_collision_threshold_s() const {
-            return m_collision_threshold_s;
-        }
-
-        [[nodiscard]] double get_velocity_mps() const {
-            return m_velocity_mps;
-        }
     private:
         IServiceBus& m_service_bus;
         double m_velocity_mps;
