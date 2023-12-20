@@ -1,6 +1,8 @@
 #include <ostream>
 #include <functional>
 
+#include "catch.hpp"
+
 namespace ch10 {
     struct SpeedUpdate {
         double velocity_mps;
@@ -99,95 +101,50 @@ namespace ch10 {
         double m_velocity_mps;
         double m_collision_threshold_s;
     };
-
-    constexpr void assert_that(bool statement, const char* message) {
-        if (!statement) {
-            throw std::runtime_error{message};
-        }
-    }
-
-    void initial_speed_is_zero() {
-        ServiceBusMock service_bus{};
-        AutoBrake auto_break{service_bus};
-
-        assert_that(auto_break.get_velocity_mps() == 0.0, "Velocity not equal to zero");
-    }
-
-    void initial_sensitivity_is_five() {
-        ServiceBusMock service_bus{};
-        AutoBrake auto_break{service_bus};
-
-        assert_that(auto_break.get_collision_threshold_s() == 5.0, "Initial sensitivity is not five");
-    }
-
-    void sensitivity_greater_than_one() {
-        ServiceBusMock service_bus{};
-        AutoBrake auto_break{service_bus};
-
-        try {
-            auto_break.set_collision_threshold_s(0.5);
-        } catch (const std::exception& e) {
-            return;
-        }
-
-        assert_that(false, "no exception thrown");
-    }
-
-    void speed_is_saved() {
-        ServiceBusMock service_bus{};
-        AutoBrake auto_break{service_bus};
-
-        service_bus.speed_update_callback(SpeedUpdate{100.0});
-        assert_that(auto_break.get_velocity_mps() == 100.0, "speed not saved");
-
-        service_bus.speed_update_callback(SpeedUpdate{50.0});
-        assert_that(auto_break.get_velocity_mps() == 50.0, "speed not saved");
-
-        service_bus.speed_update_callback(SpeedUpdate{0.0});
-        assert_that(auto_break.get_velocity_mps() == 0.0, "speed not saved");
-    }
-
-    void alert_when_imminent_collision() {
-        ServiceBusMock service_bus{};
-        AutoBrake auto_break{service_bus};
-
-        auto_break.set_collision_threshold_s(10.0);
-
-        service_bus.speed_update_callback(SpeedUpdate{100.0});
-        service_bus.car_detected_callback(CarDetected{100.0, 0.0});
-
-        assert_that(service_bus.commands_published == 1, "Brake not engaged");
-    }
-
-    void no_alert_when_no_imminent_collision() {
-        ServiceBusMock service_bus{};
-        AutoBrake auto_break{service_bus};
-
-        auto_break.set_collision_threshold_s(2.0);
-
-        service_bus.speed_update_callback(SpeedUpdate{100.0});
-        service_bus.car_detected_callback(CarDetected{1000.0, 50.0});
-
-        assert_that(service_bus.commands_published == 0, "Brake engaged");
-    }
-
-    void run_test(void(*unit_test)(), const char* name) {
-        try {
-            unit_test();
-            printf("[+] Test: %s successful.\n", name);
-        } catch (const std::exception& e) {
-            printf("[-] Test: %s failed. %s\n", name, e.what());
-        }
-    }
 }
 
-int main() {
-    ch10::run_test(ch10::initial_speed_is_zero, "initial speed is 0");
-    ch10::run_test(ch10::initial_sensitivity_is_five, "initial sensitivity is 5");
-    ch10::run_test(ch10::sensitivity_greater_than_one, "sensitivity greater than one");
-    ch10::run_test(ch10::speed_is_saved, "speed is saved");
-    ch10::run_test(ch10::alert_when_imminent_collision, "alert when imminent collision");
-    ch10::run_test(ch10::no_alert_when_no_imminent_collision, "no alert when no imminent collision");
+TEST_CASE("Ch10") {
+    ch10::ServiceBusMock service_bus{};
+    ch10::AutoBrake auto_break{service_bus};
 
-    return 0;
+    SECTION("initial speed is 0") {
+        REQUIRE(auto_break.get_velocity_mps() == 0.0);
+    }
+
+    SECTION("initial sensitivity is five") {
+        REQUIRE(auto_break.get_collision_threshold_s() == 5.0);
+    }
+
+    SECTION("sensitivity greater than one") {
+        REQUIRE_THROWS_AS(auto_break.set_collision_threshold_s(0.5), std::invalid_argument);
+    }
+
+    SECTION("speed is saved") {
+        service_bus.speed_update_callback(ch10::SpeedUpdate{100.0});
+        REQUIRE(auto_break.get_velocity_mps() == 100.0);
+
+        service_bus.speed_update_callback(ch10::SpeedUpdate{50.0});
+        REQUIRE(auto_break.get_velocity_mps() == 50.0);
+
+        service_bus.speed_update_callback(ch10::SpeedUpdate{0.0});
+        REQUIRE(auto_break.get_velocity_mps() == 0.0);
+    }
+
+    SECTION("alert when imminent collision") {
+        auto_break.set_collision_threshold_s(10.0);
+
+        service_bus.speed_update_callback(ch10::SpeedUpdate{100.0});
+        service_bus.car_detected_callback(ch10::CarDetected{100.0, 0.0});
+
+        REQUIRE(service_bus.commands_published == 1);
+    }
+
+    SECTION("no alert when no imminent collision") {
+        auto_break.set_collision_threshold_s(2.0);
+
+        service_bus.speed_update_callback(ch10::SpeedUpdate{100.0});
+        service_bus.car_detected_callback(ch10::CarDetected{1000.0, 50.0});
+
+        REQUIRE(service_bus.commands_published == 0);
+    }
 }

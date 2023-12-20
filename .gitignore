@@ -748,3 +748,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# vcpkg
+vcpkg/
+!vcpkg/.git
+vcpkg-manifest-install.log
+vcpkg_installed/
