@@ -1,7 +1,7 @@
 #include <unordered_map>
 #include <iostream>
 
-namespace ch5 {
+namespace ch05 {
     class Logger {
     public:
         Logger() = default;
@@ -84,15 +84,15 @@ namespace ch5 {
 }
 
 int main() {
-    ch5::InMemoryAccountDatabase accountDatabase;
+    ch05::InMemoryAccountDatabase accountDatabase;
 
     accountDatabase.setAmount(1, 100);
     accountDatabase.setAmount(2, 200);
     accountDatabase.setAmount(3, 300);
 
-    ch5::Bank bank{accountDatabase};
+    ch05::Bank bank{accountDatabase};
 
-    ch5::ConsoleLogger consoleLogger{"consoleLogger"};
+    ch05::ConsoleLogger consoleLogger{"consoleLogger"};
     bank.setLogger(&consoleLogger);
 
     bank.transfer(1, 2, 50);

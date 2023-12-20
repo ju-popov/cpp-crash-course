@@ -1,7 +1,7 @@
 #include <unordered_map>
 #include <iostream>
 
-namespace ch6_1 {
+namespace ch06_1 {
     template<typename T>
     concept Integer = std::is_integral<T>::value;
 
@@ -41,10 +41,10 @@ namespace ch6_1 {
 
 int main() {
     int values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 9};
-    std::cout << ch6_1::mode(values) << std::endl;
+    std::cout << ch06_1::mode(values) << std::endl;
 
     long values2[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 9};
-    std::cout << ch6_1::mode(values2) << std::endl;
+    std::cout << ch06_1::mode(values2) << std::endl;
 
     // This will not compile because double is not an Integer
     // double values3[] = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 9.9};

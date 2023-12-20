@@ -2,7 +2,7 @@
 #include <chrono>
 #include <thread>
 
-namespace ch4 {
+namespace ch04 {
     struct TimerClass {
         explicit TimerClass(const char *name) : name{name}, timestamp{getCurrentTimestamp()} {
             std::cout << this->name << ": TimerClass() timestamp: " << timestamp << std::endl;
@@ -63,15 +63,15 @@ namespace ch4 {
 }
 
 int main() {
-    ch4::TimerClass timerOne{"one"};
-    ch4::TimerClass timerOneCopyConstructor{timerOne};
-    ch4::TimerClass timerOneAssignmentOperator = timerOne;
+    ch04::TimerClass timerOne{"one"};
+    ch04::TimerClass timerOneCopyConstructor{timerOne};
+    ch04::TimerClass timerOneAssignmentOperator = timerOne;
 
-    ch4::TimerClass timerTwo{"two"};
-    ch4::TimerClass timerTwoMoveConstructor{std::move(timerTwo)};
+    ch04::TimerClass timerTwo{"two"};
+    ch04::TimerClass timerTwoMoveConstructor{std::move(timerTwo)};
 
-    ch4::TimerClass timerThree{"three"};
-    ch4::TimerClass timerThreeMoveAssignmentOperator = std::move(timerThree);
+    ch04::TimerClass timerThree{"three"};
+    ch04::TimerClass timerThreeMoveAssignmentOperator = std::move(timerThree);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }

@@ -1,6 +1,6 @@
 #include <iostream>
 
-namespace ch6_2 {
+namespace ch06_2 {
     template<typename T>
     class Bank {
     public:
@@ -81,15 +81,15 @@ namespace ch6_2 {
 }
 
 int main() {
-    ch6_2::CheckingAccount account1{"one"};
-    ch6_2::SavingAccount account2{"two"};
-    ch6_2::CheckingAccount account3{"three"};
+    ch06_2::CheckingAccount account1{"one"};
+    ch06_2::SavingAccount account2{"two"};
+    ch06_2::CheckingAccount account3{"three"};
 
     account1.setAmount(100);
     account2.setAmount(200);
     account3.setAmount(300);
 
-    ch6_2::Bank<ch6_2::Account> bank{};
+    ch06_2::Bank<ch06_2::Account> bank{};
 
     bank.transfer(account1, account2, 50);
 
