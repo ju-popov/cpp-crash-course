@@ -3,7 +3,7 @@
 
 #include "catch.hpp"
 
-namespace ch10 {
+namespace ch10_2 {
     struct SpeedUpdate {
         double velocity_mps;
     };
@@ -47,8 +47,8 @@ namespace ch10 {
     public:
         int commands_published{};
         BrakeCommand last_command{};
-        std::function<void(const ch10::SpeedUpdate &)> speed_update_callback{};
-        std::function<void(const ch10::CarDetected &)> car_detected_callback{};
+        std::function<void(const ch10_2::SpeedUpdate &)> speed_update_callback{};
+        std::function<void(const ch10_2::CarDetected &)> car_detected_callback{};
     };
 
     class AutoBrake {
@@ -101,50 +101,4 @@ namespace ch10 {
         double m_velocity_mps;
         double m_collision_threshold_s;
     };
-}
-
-TEST_CASE("Ch10") {
-    ch10::ServiceBusMock service_bus{};
-    ch10::AutoBrake auto_break{service_bus};
-
-    SECTION("initial speed is 0") {
-        REQUIRE(auto_break.get_velocity_mps() == 0.0);
-    }
-
-    SECTION("initial sensitivity is five") {
-        REQUIRE(auto_break.get_collision_threshold_s() == 5.0);
-    }
-
-    SECTION("sensitivity greater than one") {
-        REQUIRE_THROWS_AS(auto_break.set_collision_threshold_s(0.5), std::invalid_argument);
-    }
-
-    SECTION("speed is saved") {
-        service_bus.speed_update_callback(ch10::SpeedUpdate{100.0});
-        REQUIRE(auto_break.get_velocity_mps() == 100.0);
-
-        service_bus.speed_update_callback(ch10::SpeedUpdate{50.0});
-        REQUIRE(auto_break.get_velocity_mps() == 50.0);
-
-        service_bus.speed_update_callback(ch10::SpeedUpdate{0.0});
-        REQUIRE(auto_break.get_velocity_mps() == 0.0);
-    }
-
-    SECTION("alert when imminent collision") {
-        auto_break.set_collision_threshold_s(10.0);
-
-        service_bus.speed_update_callback(ch10::SpeedUpdate{100.0});
-        service_bus.car_detected_callback(ch10::CarDetected{100.0, 0.0});
-
-        REQUIRE(service_bus.commands_published == 1);
-    }
-
-    SECTION("no alert when no imminent collision") {
-        auto_break.set_collision_threshold_s(2.0);
-
-        service_bus.speed_update_callback(ch10::SpeedUpdate{100.0});
-        service_bus.car_detected_callback(ch10::CarDetected{1000.0, 50.0});
-
-        REQUIRE(service_bus.commands_published == 0);
-    }
 }
