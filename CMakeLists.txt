@@ -32,4 +32,12 @@ add_executable(ch10.2 src/ch10.2.cpp)
 # Linking of GTest libraries to the executable target
 target_link_libraries(ch10.2 PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
 # Define the test to be run by CMake test driver
-add_test(AllTestsInMain ch10.2)
+add_test(NAME GTestTestInMain COMMAND ch10.2)
+
+# Configuration for Boost testing framework
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+add_executable(ch10.3 src/ch10.3.cpp)
+# Linking of Boost libraries to the executable target
+target_link_libraries(ch10.3 PRIVATE ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+# Define the test to be run by Boost test driver
+add_test(NAME BoostTestTestInMain COMMAND ch10.3)
