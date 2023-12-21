@@ -1,7 +1,7 @@
 #include <ostream>
 #include <functional>
 
-#include "catch.hpp"
+#include "gtest/gtest.h"
 
 namespace ch10_2 {
     struct SpeedUpdate {
@@ -101,4 +101,17 @@ namespace ch10_2 {
         double m_velocity_mps;
         double m_collision_threshold_s;
     };
+}
+
+TEST(Ch10_2, AutoBrake) {
+    using namespace ch10_2;
+
+    ServiceBusMock bus{};
+    AutoBrake auto_brake{bus};
+
+    bus.speed_update_callback(SpeedUpdate{100.0});
+    bus.car_detected_callback(CarDetected{100.0, 0.0});
+
+    EXPECT_EQ(1, bus.commands_published);
+    EXPECT_EQ(1.0, bus.last_command.time_to_collision_s);
 }
