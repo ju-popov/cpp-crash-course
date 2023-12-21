@@ -1,8 +1,8 @@
 #include <ostream>
 #include <functional>
 
-#define BOOST_TEST_MODULE Ch10_3Tests
-#include "boost/test/included/unit_test.hpp"
+// #define BOOST_TEST_MODULE Ch10_3Tests
+// #include "boost/test/unit_test.hpp"
 
 namespace ch10_3 {
     struct SpeedUpdate {
