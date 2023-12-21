@@ -103,73 +103,48 @@ namespace ch10_2 {
     };
 }
 
-TEST(Ch10_2, InitialCarSpeedIsZero) {
-    using namespace ch10_2;
+struct Ch10_2 : public testing::Test {
+    ch10_2::ServiceBusMock bus{};
+    ch10_2::AutoBrake auto_brake{bus};
+};
 
-    ServiceBusMock bus{};
-    AutoBrake auto_brake{bus};
-
+TEST_F(Ch10_2, InitialCarSpeedIsZero) {
     EXPECT_EQ(0.0, auto_brake.get_velocity_mps());
 }
 
-TEST(Ch10_2, InitialSensitivityIsFive) {
-    using namespace ch10_2;
-
-    ServiceBusMock bus{};
-    AutoBrake auto_brake{bus};
-
+TEST_F(Ch10_2, InitialSensitivityIsFive) {
     EXPECT_EQ(5.0, auto_brake.get_collision_threshold_s());
 }
 
-TEST(Ch10_2, SensitivityGreaterThanOne) {
-    using namespace ch10_2;
-
-    ServiceBusMock bus{};
-    AutoBrake auto_brake{bus};
-
+TEST_F(Ch10_2, SensitivityGreaterThanOne) {
     EXPECT_THROW(auto_brake.set_collision_threshold_s(0.5), std::invalid_argument);
 }
 
-TEST (Ch10_2, SpeedIsSaved) {
-    using namespace ch10_2;
-
-    ServiceBusMock bus{};
-    AutoBrake auto_brake{bus};
-
-    bus.speed_update_callback(SpeedUpdate{100.0});
+TEST_F(Ch10_2, SpeedIsSaved) {
+    bus.speed_update_callback(ch10_2::SpeedUpdate{100.0});
     EXPECT_EQ(100.0, auto_brake.get_velocity_mps());
 
-    bus.speed_update_callback(SpeedUpdate{50.0});
+    bus.speed_update_callback(ch10_2::SpeedUpdate{50.0});
     EXPECT_EQ(50.0, auto_brake.get_velocity_mps());
 
-    bus.speed_update_callback(SpeedUpdate{0.0});
+    bus.speed_update_callback(ch10_2::SpeedUpdate{0.0});
     EXPECT_EQ(0.0, auto_brake.get_velocity_mps());
 }
 
-TEST (Ch10_2, AlertWhenImminentCollisionDetected) {
-    using namespace ch10_2;
-
-    ServiceBusMock bus{};
-    AutoBrake auto_brake{bus};
-
+TEST_F(Ch10_2, AlertWhenImminentCollisionDetected) {
     auto_brake.set_collision_threshold_s(10.0);
 
-    bus.speed_update_callback(SpeedUpdate{100.0});
-    bus.car_detected_callback(CarDetected{100.0, 0.0});
+    bus.speed_update_callback(ch10_2::SpeedUpdate{100.0});
+    bus.car_detected_callback(ch10_2::CarDetected{100.0, 0.0});
 
     EXPECT_EQ(1, bus.commands_published);
 }
 
-TEST (Ch10_2, NoAlertWhenNoImminentCollisionDetected) {
-    using namespace ch10_2;
-
-    ServiceBusMock bus{};
-    AutoBrake auto_brake{bus};
-
+TEST_F(Ch10_2, NoAlertWhenNoImminentCollisionDetected) {
     auto_brake.set_collision_threshold_s(2.0);
 
-    bus.speed_update_callback(SpeedUpdate{100.0});
-    bus.car_detected_callback(CarDetected{1000.0, 50.0});
+    bus.speed_update_callback(ch10_2::SpeedUpdate{100.0});
+    bus.car_detected_callback(ch10_2::CarDetected{1000.0, 50.0});
 
     EXPECT_EQ(0, bus.commands_published);
 }
