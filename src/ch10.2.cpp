@@ -103,15 +103,73 @@ namespace ch10_2 {
     };
 }
 
-TEST(Ch10_2, AutoBrake) {
+TEST(Ch10_2, InitialCarSpeedIsZero) {
+    using namespace ch10_2;
+
+    ServiceBusMock bus{};
+    AutoBrake auto_brake{bus};
+
+    EXPECT_EQ(0.0, auto_brake.get_velocity_mps());
+}
+
+TEST(Ch10_2, InitialSensitivityIsFive) {
+    using namespace ch10_2;
+
+    ServiceBusMock bus{};
+    AutoBrake auto_brake{bus};
+
+    EXPECT_EQ(5.0, auto_brake.get_collision_threshold_s());
+}
+
+TEST(Ch10_2, SensitivityGreaterThanOne) {
+    using namespace ch10_2;
+
+    ServiceBusMock bus{};
+    AutoBrake auto_brake{bus};
+
+    EXPECT_THROW(auto_brake.set_collision_threshold_s(0.5), std::invalid_argument);
+}
+
+TEST (Ch10_2, SpeedIsSaved) {
     using namespace ch10_2;
 
     ServiceBusMock bus{};
     AutoBrake auto_brake{bus};
 
     bus.speed_update_callback(SpeedUpdate{100.0});
+    EXPECT_EQ(100.0, auto_brake.get_velocity_mps());
+
+    bus.speed_update_callback(SpeedUpdate{50.0});
+    EXPECT_EQ(50.0, auto_brake.get_velocity_mps());
+
+    bus.speed_update_callback(SpeedUpdate{0.0});
+    EXPECT_EQ(0.0, auto_brake.get_velocity_mps());
+}
+
+TEST (Ch10_2, AlertWhenImminentCollisionDetected) {
+    using namespace ch10_2;
+
+    ServiceBusMock bus{};
+    AutoBrake auto_brake{bus};
+
+    auto_brake.set_collision_threshold_s(10.0);
+
+    bus.speed_update_callback(SpeedUpdate{100.0});
     bus.car_detected_callback(CarDetected{100.0, 0.0});
 
     EXPECT_EQ(1, bus.commands_published);
-    EXPECT_EQ(1.0, bus.last_command.time_to_collision_s);
+}
+
+TEST (Ch10_2, NoAlertWhenNoImminentCollisionDetected) {
+    using namespace ch10_2;
+
+    ServiceBusMock bus{};
+    AutoBrake auto_brake{bus};
+
+    auto_brake.set_collision_threshold_s(2.0);
+
+    bus.speed_update_callback(SpeedUpdate{100.0});
+    bus.car_detected_callback(CarDetected{1000.0, 50.0});
+
+    EXPECT_EQ(0, bus.commands_published);
 }
