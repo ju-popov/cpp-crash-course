@@ -1,20 +1,31 @@
+# minimum CMake version to run this file
 cmake_minimum_required(VERSION 3.12)
 
+# setting the path for the cmake toolchain file
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
+# name of the project
 project(CppCrashCourse)
 
+# enabling export of compile commands
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# setting the CMake C++ standard to be used
 set(CPP_STANDARD 20)
 set(CMAKE_CXX_STANDARD ${CPP_STANDARD})
+
+# if the specified CMake version cannot be found, make it a fatal error
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# locating the required Catch2, GTest and Boost packages (version 3 and up for Catch2) for the specified components and configurations
 find_package(Catch2 3 CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
+# enabling testing for the current directory and below
 enable_testing()
 
+# defining a function to add the specified executable target and link necessary libraries to it
 function(add_executable_and_link_libraries TARGET_NAME SOURCE_FILE LIBRARIES)
     add_executable(${TARGET_NAME} ${SOURCE_FILE})
     target_link_libraries(${TARGET_NAME} PRIVATE ${LIBRARIES})
