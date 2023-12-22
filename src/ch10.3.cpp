@@ -1,5 +1,4 @@
 #include <ostream>
-#include <functional>
 
 #define BOOST_TEST_MODULE Ch10_3
 #include <boost/test/unit_test.hpp>
@@ -104,31 +103,24 @@ namespace ch10_3 {
     };
 }
 
-BOOST_AUTO_TEST_CASE(InitialCarSpeedIsZero) {
+struct MyTestFixture {
     ch10_3::ServiceBusMock bus{};
     ch10_3::AutoBrake auto_brake{bus};
+};
 
+BOOST_FIXTURE_TEST_CASE(InitialCarSpeedIsZero, MyTestFixture) {
     BOOST_TEST(0 == auto_brake.get_velocity_mps());
 }
 
-BOOST_AUTO_TEST_CASE(InitialSensitivityIsFive) {
-    ch10_3::ServiceBusMock bus{};
-    ch10_3::AutoBrake auto_brake{bus};
-
+BOOST_FIXTURE_TEST_CASE(InitialSensitivityIsFive, MyTestFixture) {
     BOOST_TEST(5 == auto_brake.get_collision_threshold_s());
 }
 
-BOOST_AUTO_TEST_CASE(SensitivityGreaterThanOne) {
-    ch10_3::ServiceBusMock bus{};
-    ch10_3::AutoBrake auto_brake{bus};
-
+BOOST_FIXTURE_TEST_CASE(SensitivityGreaterThanOne, MyTestFixture) {
     BOOST_CHECK_THROW(auto_brake.set_collision_threshold_s(0.5), std::invalid_argument);
 }
 
-BOOST_AUTO_TEST_CASE(SpeedIsSaved) {
-    ch10_3::ServiceBusMock bus{};
-    ch10_3::AutoBrake auto_brake{bus};
-
+BOOST_FIXTURE_TEST_CASE(SpeedIsSaved, MyTestFixture) {
     bus.speed_update_callback(ch10_3::SpeedUpdate{100.0});
     BOOST_TEST(100.0 == auto_brake.get_velocity_mps());
 
@@ -139,10 +131,7 @@ BOOST_AUTO_TEST_CASE(SpeedIsSaved) {
     BOOST_TEST(0.0 == auto_brake.get_velocity_mps());
 }
 
-BOOST_AUTO_TEST_CASE(AlertWhenImminentCollisionDetected) {
-    ch10_3::ServiceBusMock bus{};
-    ch10_3::AutoBrake auto_brake{bus};
-
+BOOST_FIXTURE_TEST_CASE(AlertWhenImminentCollisionDetected, MyTestFixture) {
     bus.speed_update_callback(ch10_3::SpeedUpdate{100.0});
     bus.car_detected_callback(ch10_3::CarDetected{100.0, 0.0});
 
@@ -150,10 +139,7 @@ BOOST_AUTO_TEST_CASE(AlertWhenImminentCollisionDetected) {
     BOOST_TEST(1.0 == bus.last_command.time_to_collision_s);
 }
 
-BOOST_AUTO_TEST_CASE(NoAlertWhenNotImminentCollisionDetected) {
-    ch10_3::ServiceBusMock bus{};
-    ch10_3::AutoBrake auto_brake{bus};
-
+BOOST_FIXTURE_TEST_CASE(NoAlertWhenNotImminentCollisionDetected, MyTestFixture) {
     bus.speed_update_callback(ch10_3::SpeedUpdate{100.0});
     bus.car_detected_callback(ch10_3::CarDetected{1000.0, 50.0});
 
