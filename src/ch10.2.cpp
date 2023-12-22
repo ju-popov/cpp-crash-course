@@ -103,7 +103,7 @@ namespace ch10_2 {
     };
 }
 
-struct Ch10_2 : public testing::Test {
+struct Ch10_2 : public ::testing::Test {
     ch10_2::ServiceBusMock bus{};
     ch10_2::AutoBrake auto_brake{bus};
 };

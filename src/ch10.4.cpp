@@ -2,8 +2,9 @@
 #include <functional>
 
 #include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
-namespace ch10_2 {
+namespace ch10_4 {
     struct SpeedUpdate {
         double velocity_mps;
     };
@@ -27,28 +28,6 @@ namespace ch10_2 {
         virtual void subscribe(const std::function<void(const SpeedUpdate&)>& callback) = 0;
 
         virtual void subscribe(const std::function<void(const CarDetected&)>& callback) = 0;
-    };
-
-    class ServiceBusMock : public IServiceBus {
-    public:
-        void publish(const BrakeCommand& cmd) override {
-            commands_published++;
-            last_command = cmd;
-        }
-
-        void subscribe(const std::function<void(const SpeedUpdate&)>& callback) override {
-            speed_update_callback = callback;
-        }
-
-        void subscribe(const std::function<void(const CarDetected&)>& callback) override {
-            car_detected_callback = callback;
-        }
-
-    public:
-        int commands_published{};
-        BrakeCommand last_command{};
-        std::function<void(const ch10_2::SpeedUpdate &)> speed_update_callback{};
-        std::function<void(const ch10_2::CarDetected &)> car_detected_callback{};
     };
 
     class AutoBrake {
@@ -103,48 +82,27 @@ namespace ch10_2 {
     };
 }
 
-struct Ch10_2 : public testing::Test {
-    ch10_2::ServiceBusMock bus{};
-    ch10_2::AutoBrake auto_brake{bus};
+class ServiceBusMock : public ch10_4::IServiceBus {
+    MOCK_METHOD1(publish, void(const ch10_4::BrakeCommand& cmd));
+    MOCK_METHOD1(subscribe, void(const std::function<void(const ch10_4::SpeedUpdate&)>& callback));
+    MOCK_METHOD1(subscribe, void(const std::function<void(const ch10_4::CarDetected&)>& callback));
 };
 
-TEST_F(Ch10_2, InitialCarSpeedIsZero) {
+struct Ch10_4Nice : public ::testing::Test {
+    ::testing::NiceMock<ServiceBusMock> bus;
+    ch10_4::AutoBrake auto_brake{bus};
+};
+
+TEST_F(Ch10_4Nice, InitialCarSpeedIsZero) {
     EXPECT_EQ(0.0, auto_brake.get_velocity_mps());
 }
 
-TEST_F(Ch10_2, InitialSensitivityIsFive) {
+TEST_F(Ch10_4Nice, InitialSensitivityIsFive) {
     EXPECT_EQ(5.0, auto_brake.get_collision_threshold_s());
 }
 
-TEST_F(Ch10_2, SensitivityGreaterThanOne) {
+TEST_F(Ch10_4Nice, SensitivityGreaterThanOne) {
     EXPECT_THROW(auto_brake.set_collision_threshold_s(0.5), std::invalid_argument);
 }
 
-TEST_F(Ch10_2, SpeedIsSaved) {
-    bus.speed_update_callback(ch10_2::SpeedUpdate{100.0});
-    EXPECT_EQ(100.0, auto_brake.get_velocity_mps());
-
-    bus.speed_update_callback(ch10_2::SpeedUpdate{50.0});
-    EXPECT_EQ(50.0, auto_brake.get_velocity_mps());
-
-    bus.speed_update_callback(ch10_2::SpeedUpdate{0.0});
-    EXPECT_EQ(0.0, auto_brake.get_velocity_mps());
-}
-
-TEST_F(Ch10_2, AlertWhenImminentCollisionDetected) {
-    auto_brake.set_collision_threshold_s(10.0);
-
-    bus.speed_update_callback(ch10_2::SpeedUpdate{100.0});
-    bus.car_detected_callback(ch10_2::CarDetected{100.0, 0.0});
-
-    EXPECT_EQ(1, bus.commands_published);
-}
-
-TEST_F(Ch10_2, NoAlertWhenNoImminentCollisionDetected) {
-    auto_brake.set_collision_threshold_s(2.0);
-
-    bus.speed_update_callback(ch10_2::SpeedUpdate{100.0});
-    bus.car_detected_callback(ch10_2::CarDetected{1000.0, 50.0});
-
-    EXPECT_EQ(0, bus.commands_published);
-}
+// TODO
