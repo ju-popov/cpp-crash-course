@@ -38,6 +38,6 @@ add_test(NAME GTestTestInMain COMMAND ch10.2)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 add_executable(ch10.3 src/ch10.3.cpp)
 # Linking of Boost libraries to the executable target
-target_link_libraries(ch10.3 PRIVATE ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(ch10.3 PRIVATE Boost::unit_test_framework)
 # Define the test to be run by Boost test driver
 add_test(NAME BoostTestTestInMain COMMAND ch10.3)
