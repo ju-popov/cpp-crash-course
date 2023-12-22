@@ -1,5 +1,9 @@
 {
   "name" : "cpp-crash-course",
   "version" : "1.0.0",
-  "dependencies" : [ "boost-test", "catch2", "gtest" ]
+  "dependencies" : [
+    "boost-test",
+    "catch2",
+    "gtest"
+  ]
 }

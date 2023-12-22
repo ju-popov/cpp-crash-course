@@ -26,23 +26,26 @@ find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 enable_testing()
 
 # defining a function to add the specified executable target and link necessary libraries to it
-function(add_executable_and_link_libraries TARGET_NAME SOURCE_FILE LIBRARIES)
+function(add_executable_and_link_libraries TARGET_NAME SOURCE_FILE)
     add_executable(${TARGET_NAME} ${SOURCE_FILE})
-    target_link_libraries(${TARGET_NAME} PRIVATE ${LIBRARIES})
+    target_link_libraries(${TARGET_NAME} PRIVATE ${ARGN})
 endfunction()
 
-add_executable_and_link_libraries("ch04" "src/ch04.cpp" "")
+add_executable_and_link_libraries("ch04" "src/ch04.cpp")
 
-add_executable_and_link_libraries("ch05" "src/ch05.cpp" "")
+add_executable_and_link_libraries("ch05" "src/ch05.cpp")
 
-add_executable_and_link_libraries("ch06.1" "src/ch06.1.cpp" "")
+add_executable_and_link_libraries("ch06.1" "src/ch06.1.cpp")
 
-add_executable_and_link_libraries("ch06.2" "src/ch06.2.cpp" "")
+add_executable_and_link_libraries("ch06.2" "src/ch06.2.cpp")
 
 add_executable_and_link_libraries("ch10.1" "src/ch10.1.cpp" Catch2::Catch2 Catch2::Catch2WithMain)
 
-add_executable_and_link_libraries("ch10.2" "src/ch10.2.cpp" GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
-add_test(NAME GTestTestInMain COMMAND ch10.2)
+add_executable_and_link_libraries("ch10.2" "src/ch10.2.cpp" GTest::gtest GTest::gtest_main)
+add_test(NAME GTestCh10.2 COMMAND ch10.2)
 
 add_executable_and_link_libraries("ch10.3" "src/ch10.3.cpp" Boost::unit_test_framework)
-add_test(NAME BoostTestTestInMain COMMAND ch10.3)
+add_test(NAME BoostTestTCh10.3 COMMAND ch10.3)
+
+add_executable_and_link_libraries("ch10.4" "src/ch10.4.cpp" GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
+add_test(NAME GTestCh10.4 COMMAND ch10.4)
