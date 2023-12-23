@@ -2,6 +2,7 @@
   "name" : "cpp-crash-course",
   "version" : "1.0.0",
   "dependencies" : [
+    "boost-smart-ptr",
     "boost-test",
     "catch2",
     "gtest"

@@ -20,7 +20,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # locating the required Catch2, GTest and Boost packages (version 3 and up for Catch2) for the specified components and configurations
 find_package(Catch2 3 CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
-find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
 # enabling testing for the current directory and below
 enable_testing()
@@ -49,3 +49,7 @@ add_test(NAME BoostTestTCh10.3 COMMAND ch10.3)
 
 add_executable_and_link_libraries("ch10.4" "src/ch10.4.cpp" GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
 add_test(NAME GTestCh10.4 COMMAND ch10.4)
+
+add_executable_and_link_libraries("ch11.1-scoped-ptr" "src/ch11.1-scoped-ptr.cpp" Boost::boost Catch2::Catch2 Catch2::Catch2WithMain)
+
+add_executable_and_link_libraries("ch11.2-unique-ptr" "src/ch11.2-unique-ptr.cpp" Catch2::Catch2 Catch2::Catch2WithMain)

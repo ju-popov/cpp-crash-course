@@ -103,7 +103,7 @@ namespace ch10_1 {
     };
 }
 
-TEST_CASE("Ch10") {
+TEST_CASE("Ch10_1") {
     ch10_1::ServiceBusMock service_bus{};
     ch10_1::AutoBrake auto_break{service_bus};
 
